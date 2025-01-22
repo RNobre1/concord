@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat WebSocket</title>
+    <!-- Link para o arquivo CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<h1>Chat WebSocket</h1>
+
+<!-- Autenticação -->
+<div id="auth">
+    <h2>Autenticação</h2>
+    <input type="text" id="nome" placeholder="Nome (para registro)">
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Senha">
+    <button id="register">Registrar</button>
+    <button id="login">Login</button>
+</div>
+
+<!-- Chat -->
+<div id="chat" style="display: none;">
+    <h2>Chat</h2>
+    <p id="user-info"></p>
+
+    <!-- Contêiner dos chats -->
+    <div id="chats"></div>
+
+    <!-- Histórico de mensagens -->
+    <div id="messages"></div>
+
+    <!-- Entrada de mensagem -->
+    <textarea id="message-input" placeholder="Digite sua mensagem..."></textarea>
+    <button id="send-message">Enviar</button>
+
+    <!-- Criação de grupo -->
+    <h3>Criar Grupo</h3>
+    <input type="text" id="group-name" placeholder="Nome do grupo">
+    <input type="text" id="group-participants" placeholder="IDs dos participantes (separados por vírgula)">
+    <button id="create-group">Criar Grupo</button>
+</div>
+
+<!-- Script para o arquivo JavaScript -->
+<script src="cliente.js"></script>
+</body>
+</html>
