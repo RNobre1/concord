@@ -1,12 +1,51 @@
+/* Estilização geral */
 body {
     font-family: Arial, sans-serif;
     margin: 20px;
 }
 
-#auth, #chat {
+#auth, #chat, #chat-list {
     margin-bottom: 20px;
 }
 
+/* Listagem de chats */
+#chat-list ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+#chat-list li {
+    cursor: pointer;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+#chat-list li:hover {
+    background-color: #f9f9f9;
+}
+
+/* Popup de criação de grupo */
+#popup-create-group {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 20px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#popup-create-group input {
+    display: block;
+    margin-bottom: 10px;
+}
+
+#popup-create-group button {
+    margin-right: 10px;
+}
+
+/* Histórico de mensagens */
 #messages {
     border: 1px solid #ccc;
     padding: 10px;
@@ -39,16 +78,16 @@ body {
     background-color: #d1e7dd;
 }
 
+/* Inputs e botões */
 input, button, textarea {
     margin: 5px 0;
-    padding: 10px;
-    width: calc(100% - 22px);
-}
-
-button {
-    cursor: pointer;
 }
 
 textarea {
     resize: none;
+}
+
+/* Botão geral */
+button {
+    cursor: pointer;
 }

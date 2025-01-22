@@ -13,20 +13,33 @@
 <!-- Autenticação -->
 <div id="auth">
     <h2>Autenticação</h2>
-    <input type="text" id="nome" placeholder="Nome (para registro)">
+    <input type="text" id="nome" placeholder="Nome para registro">
     <input type="email" id="email" placeholder="Email">
     <input type="password" id="password" placeholder="Senha">
     <button id="register">Registrar</button>
     <button id="login">Login</button>
 </div>
 
+<!-- Listagem de chats -->
+<div id="chat-list" style="display: none;">
+    <h2>Seus Chats</h2>
+    <ul id="chat-list-items"></ul>
+    <button id="create-chat">Criar Novo Chat</button>
+</div>
+
+<!-- Popup para criação de grupo -->
+<div id="popup-create-group" style="display: none;">
+    <h3>Criar Novo Grupo</h3>
+    <input type="text" id="popup-group-name" placeholder="Nome do grupo">
+    <input type="text" id="popup-group-participants" placeholder="IDs dos participantes (separados por vírgula)">
+    <button id="popup-create-group-btn">Criar</button>
+    <button id="popup-cancel">Cancelar</button>
+</div>
+
 <!-- Chat -->
 <div id="chat" style="display: none;">
     <h2>Chat</h2>
     <p id="user-info"></p>
-
-    <!-- Contêiner dos chats -->
-    <div id="chats"></div>
 
     <!-- Histórico de mensagens -->
     <div id="messages"></div>
@@ -35,11 +48,8 @@
     <textarea id="message-input" placeholder="Digite sua mensagem..."></textarea>
     <button id="send-message">Enviar</button>
 
-    <!-- Criação de grupo -->
-    <h3>Criar Grupo</h3>
-    <input type="text" id="group-name" placeholder="Nome do grupo">
-    <input type="text" id="group-participants" placeholder="IDs dos participantes (separados por vírgula)">
-    <button id="create-group">Criar Grupo</button>
+    <!-- Botão para voltar à listagem -->
+    <button id="back-to-list">Voltar para Listagem</button>
 </div>
 
 <!-- Script para o arquivo JavaScript -->
