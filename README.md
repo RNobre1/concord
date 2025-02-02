@@ -39,25 +39,26 @@ Uma aplicação de chat em tempo real desenvolvida com WebSocket que permite com
 ## ⚙️ Instalação
 
 1. Clone o repositório:
-'''
+```
 git clone https://github.com/RNobre1/web_chat.git
 cd web_chat
-'''
+```
 
 
-2. Instale as dependências:
-'''
+
+3. Instale as dependências:
+```
 npm install
-'''
+```
 
 
-3. Configure o banco de dados:
+4. Configure o banco de dados:
 - Instale PostgreSQL
 - Execute o script `criacao-banco.sql`
 
 4. Inicie o servidor:
-'''
+```
 node server.js
-'''
+```
 
 5. Acesse a aplicação em `http://localhost:3000`
