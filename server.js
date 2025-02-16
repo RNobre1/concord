@@ -180,7 +180,36 @@ wss.on('connection', (ws) => {
                     });
             }
 
-            // Enviar mensagem no chat atual
+            // Handler para carregar o histórico do chat assim que o usuário abre a conversa
+            else if (data.type === 'load_chat') {
+                const { token, chatId } = data;
+                const decoded = authenticate(token);
+
+                if (!decoded) {
+                    ws.send(JSON.stringify({ type: 'error', message: 'Token inválido.' }));
+                    return;
+                }
+
+                const historyQuery = `
+        SELECT senderid, content, send_at
+        FROM message
+        WHERE chatid = $1
+        ORDER BY send_at ASC;
+    `;
+                pool.query(historyQuery, [chatId])
+                    .then(historyResult => {
+                        ws.send(JSON.stringify({
+                            type: 'chat_history',
+                            chatId,
+                            messages: historyResult.rows,
+                        }));
+                    })
+                    .catch(err => console.error("Erro ao carregar histórico:", err));
+            }
+
+
+                // Enviar mensagem no chat atual
+            // Modificação do handler de "send_message" para enviar a atualização a todos os participantes conectados
             else if (data.type === 'send_message') {
                 const { token, chatId, content } = data;
                 const decoded = authenticate(token);
@@ -192,15 +221,13 @@ wss.on('connection', (ws) => {
 
                 const senderId = decoded.userId;
 
-                // Armazena a mensagem no banco de dados
                 const messageQuery = `
                     INSERT INTO message (chatid, senderid, content)
                     VALUES ($1, $2, $3)
-                    RETURNING messageID
+                        RETURNING messageID;
                 `;
                 pool.query(messageQuery, [chatId, senderId, content])
                     .then(() => {
-                        // Recupera o histórico atualizado do chat e envia aos clientes conectados
                         const historyQuery = `
                             SELECT senderid, content, send_at
                             FROM message
@@ -209,16 +236,22 @@ wss.on('connection', (ws) => {
                         `;
                         pool.query(historyQuery, [chatId])
                             .then(historyResult => {
-                                ws.send(JSON.stringify({
-                                    type: 'chat_history',
-                                    chatId,
-                                    messages: historyResult.rows,
-                                }));
+                                // Itera sobre todos os clientes conectados e envia o histórico atualizado
+                                Object.values(clients).forEach(client => {
+                                    if (client.readyState === WebSocket.OPEN) {
+                                        client.send(JSON.stringify({
+                                            type: 'chat_history',
+                                            chatId,
+                                            messages: historyResult.rows,
+                                        }));
+                                    }
+                                });
                             })
                             .catch(err => console.error("Erro ao carregar histórico:", err));
                     })
                     .catch(err => console.error("Erro ao enviar mensagem:", err));
             }
+
         } catch (err) {
             console.error("Erro ao processar mensagem:", err);
         }
