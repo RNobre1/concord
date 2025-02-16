@@ -1,16 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat WebSocket</title>
-    <!-- Link para o arquivo CSS -->
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<h1>Chat WebSocket</h1>
-
-<!-- Autenticação -->
+<!-- Tela de Autenticação -->
 <div id="auth">
     <h2>Autenticação</h2>
     <input type="text" id="nome" placeholder="Nome para registro">
@@ -20,15 +17,36 @@
     <button id="login">Login</button>
 </div>
 
-<!-- Listagem de chats -->
-<div id="chat-list" style="display: none;">
-    <h2>Seus Chats</h2>
-    <ul id="chat-list-items"></ul>
-    <button id="create-chat">Criar Novo Chat</button>
+<!-- Aplicação Principal -->
+<div id="app" style="display: none;">
+    <div id="sidebar">
+        <div id="profile">
+            <img id="profile-pic" src="https://via.placeholder.com/50" alt="Foto de Perfil">
+            <div id="profile-info">Usuário (ID)</div>
+        </div>
+        <div id="chat-list-section">
+            <h2>Seus Chats</h2>
+            <ul id="chat-list-items"></ul>
+            <button id="create-chat">Criar Novo Chat</button>
+        </div>
+    </div>
+    <div id="chat-area">
+        <div id="chat-header">
+            <h2>Conversa</h2>
+            <button id="back-to-list" style="display: none;">Voltar</button>
+        </div>
+        <div id="chat-content">
+            <div id="messages"></div>
+        </div>
+        <div id="chat-input">
+            <textarea id="message-input" placeholder="Digite sua mensagem..."></textarea>
+            <button id="send-message">Enviar</button>
+        </div>
+    </div>
 </div>
 
-<!-- Popup para criação de grupo -->
-<div id="popup-create-group" style="display: none;">
+<!-- Popup para Criação de Grupo -->
+<div id="popup-create-group" class="popup" style="display: none;">
     <h3>Criar Novo Grupo</h3>
     <input type="text" id="popup-group-name" placeholder="Nome do grupo">
     <input type="text" id="popup-group-participants" placeholder="IDs dos participantes (separados por vírgula)">
@@ -36,23 +54,6 @@
     <button id="popup-cancel">Cancelar</button>
 </div>
 
-<!-- Chat -->
-<div id="chat" style="display: none;">
-    <h2>Chat</h2>
-    <p id="user-info"></p>
-
-    <!-- Histórico de mensagens -->
-    <div id="messages"></div>
-
-    <!-- Entrada de mensagem -->
-    <textarea id="message-input" placeholder="Digite sua mensagem..."></textarea>
-    <button id="send-message">Enviar</button>
-
-    <!-- Botão para voltar à listagem -->
-    <button id="back-to-list">Voltar para Listagem</button>
-</div>
-
-<!-- Script para o arquivo JavaScript -->
 <script src="cliente.js"></script>
 </body>
 </html>

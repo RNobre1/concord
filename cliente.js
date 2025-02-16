@@ -2,9 +2,9 @@
 const ws = new WebSocket("ws://localhost:8080");
 
 // Variáveis globais
-let token = null; // Armazena o token JWT após login
-let userId = null; // Armazena o ID do usuário logado
-let currentChatId = null; // ID do chat atualmente aberto
+let token = null;
+let userId = null;
+let currentChatId = null;
 
 // Evento ao abrir a conexão WebSocket
 ws.onopen = () => {
@@ -18,26 +18,29 @@ ws.onmessage = (event) => {
     if (data.type === "register_success") {
         alert(`Registro bem-sucedido! Seu ID: ${data.userId}`);
     } else if (data.type === "login_success") {
-        token = data.token; // Salva o token JWT
+        token = data.token;
+        userId = jwtDecode(token).userId;
+        // Tenta obter o nome via token ou pelo campo de registro; se indisponível, usa um valor padrão
+        const nome = jwtDecode(token).nome || document.getElementById("nome").value || "Usuário";
         alert("Login realizado com sucesso!");
         document.getElementById("auth").style.display = "none";
-        document.getElementById("chat-list").style.display = "block";
-        userId = jwtDecode(token).userId; // Decodifica o token para obter o userId
-        document.getElementById("user-info").innerText = `Seu ID de usuário: ${userId}`;
-        listChats(); // Carrega a lista de chats do usuário
+        document.getElementById("app").style.display = "flex";
+        // Atualiza a informação do perfil com a imagem, nome e ID
+        document.getElementById("profile-info").innerText = `${nome} (${userId})`;
+        listChats();
     } else if (data.type === "chat_list") {
-        loadChatList(data.chats); // Exibe a lista de chats
+        loadChatList(data.chats);
     } else if (data.type === "chat_history") {
-        loadChatHistory(data.messages); // Carrega o histórico de mensagens do chat atual
+        loadChatHistory(data.messages);
     } else if (data.type === "group_created") {
         alert(`Grupo "${data.groupName}" criado com sucesso!`);
-        openChat(data.chatId); // Abre o chat automaticamente após a criação
+        openChat(data.chatId);
     } else if (data.type === "error") {
         alert(`Erro: ${data.message}`);
     }
 };
 
-// Evento ao ocorrer um erro na conexão WebSocket
+// Evento de erro na conexão WebSocket
 ws.onerror = (error) => {
     console.error("Erro no WebSocket:", error);
 };
@@ -76,10 +79,10 @@ function listChats() {
     }));
 }
 
-// Função para carregar a lista de chats na interface
+// Função para carregar a lista de chats na sidebar
 function loadChatList(chats) {
     const chatList = document.getElementById("chat-list-items");
-    chatList.innerHTML = ""; // Limpa a lista anterior
+    chatList.innerHTML = "";
 
     chats.forEach((chat) => {
         const li = document.createElement("li");
@@ -92,60 +95,48 @@ function loadChatList(chats) {
 // Função para abrir um chat específico
 function openChat(chatId) {
     currentChatId = chatId;
-
-    // Solicita o histórico de mensagens do servidor
     ws.send(JSON.stringify({
         type: "load_chat",
         token,
         chatId,
     }));
-
-    document.getElementById("chat-list").style.display = "none";
-    document.getElementById("chat").style.display = "block";
 }
 
-// Função para carregar o histórico de mensagens no chat atual
+// Função para carregar o histórico de mensagens do chat atual
 function loadChatHistory(messages) {
     const messagesDiv = document.getElementById("messages");
-    messagesDiv.innerHTML = ""; // Limpa mensagens anteriores
-
+    messagesDiv.innerHTML = "";
     messages.forEach((msg) => {
         addMessage(msg.senderid === userId ? "right" : "left", msg.content);
     });
-
-    messagesDiv.scrollTop = messagesDiv.scrollHeight; // Rola para a última mensagem
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
 // Função para adicionar uma mensagem ao chat
 function addMessage(side, content) {
     const messagesDiv = document.getElementById("messages");
     const messageDiv = document.createElement("div");
-
     messageDiv.classList.add("message", side);
     messageDiv.innerHTML = `<div class="message-content">${content}</div>`;
-
     messagesDiv.appendChild(messageDiv);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight; // Rola para a última mensagem
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
-// Enviar mensagem no chat atual
+// Envio de mensagem
 document.getElementById("send-message").onclick = () => {
     const content = document.getElementById("message-input").value;
-
     if (!currentChatId || !content.trim()) return;
-
     ws.send(JSON.stringify({
         type: "send_message",
         token,
         chatId: currentChatId,
         content,
     }));
-
-    addMessage("right", content); // Exibe a mensagem enviada localmente
-    document.getElementById("message-input").value = ""; // Limpa o campo de texto
+    addMessage("right", content);
+    document.getElementById("message-input").value = "";
 };
 
-// Criar um novo grupo/conversa pelo popup
+// Popup para criação de grupo
 document.getElementById("create-chat").onclick = () => {
     document.getElementById("popup-create-group").style.display = "block";
 };
@@ -166,23 +157,19 @@ document.getElementById("popup-create-group-btn").onclick = () => {
         groupName,
         participants,
     }));
-
     document.getElementById("popup-create-group").style.display = "none";
 };
 
-// Voltar para a listagem de chats
+// Botão para voltar à lista (útil em dispositivos móveis)
 document.getElementById("back-to-list").onclick = () => {
     currentChatId = null;
-
-    document.getElementById("chat").style.display = "none";
-    document.getElementById("chat-list").style.display = "block";
+    document.getElementById("messages").innerHTML = "";
 };
 
-// Função para decodificar o token JWT e obter informações do usuário logado
+// Função para decodificar o token JWT
 function jwtDecode(token) {
     const base64Url = token.split(".")[1];
     const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-
     return JSON.parse(decodeURIComponent(
         atob(base64)
             .split("")
