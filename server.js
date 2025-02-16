@@ -25,8 +25,9 @@ pool.connect()
 const wss = new WebSocket.Server({ port: 8080 });
 console.log("Servidor WebSocket rodando na porta 8080");
 
-// Armazena conexões ativas dos usuários
-const clients = {};
+// Estruturas de controle
+const clients = {}; // Usuários autenticados
+const chatSubscriptions = {}; // Mapeamento de chats para conexões ativas
 
 // Função para autenticar usuários com JWT
 function authenticate(token) {
@@ -40,6 +41,7 @@ function authenticate(token) {
 // Evento ao conectar um cliente WebSocket
 wss.on('connection', (ws) => {
     let userId;
+    let currentChatId = null;
 
     // Evento ao receber mensagens do cliente
     ws.on('message', async (message) => {
@@ -83,7 +85,6 @@ wss.on('connection', (ws) => {
                         userId = result.rows[0].userid;
                         const token = jwt.sign({ userId }, process.env.JWT_SECRET);
 
-                        // Registra a sessão no banco de dados
                         const sessionQuery = `
                             INSERT INTO session (userid, token)
                             VALUES ($1, $2)
@@ -116,7 +117,7 @@ wss.on('connection', (ws) => {
                 const query = `
                     SELECT c.chatid, c.nome, c.tipo_do_chat
                     FROM chat c
-                    INNER JOIN chatusers cu ON c.chatid = cu.chatid
+                             INNER JOIN chatusers cu ON c.chatid = cu.chatid
                     WHERE cu.userid = $1;
                 `;
                 pool.query(query, [decoded.userId])
@@ -141,7 +142,6 @@ wss.on('connection', (ws) => {
 
                 const creatorId = decoded.userId;
 
-                // Cria um novo chat do tipo grupo
                 const chatQuery = `
                     INSERT INTO chat (tipo_do_chat, nome)
                     VALUES ('grupo', $1)
@@ -151,7 +151,6 @@ wss.on('connection', (ws) => {
                     .then(chatResult => {
                         const chatId = chatResult.rows[0].chatid;
 
-                        // Adiciona os participantes ao chat
                         const participantQueries = participants.map(participantId =>
                             pool.query(`INSERT INTO chatusers (chatid, userid) VALUES ($1, $2)`, [chatId, participantId])
                         );
@@ -180,7 +179,7 @@ wss.on('connection', (ws) => {
                     });
             }
 
-            // Handler para carregar o histórico do chat assim que o usuário abre a conversa
+            // Handler para carregar o chat
             else if (data.type === 'load_chat') {
                 const { token, chatId } = data;
                 const decoded = authenticate(token);
@@ -190,12 +189,27 @@ wss.on('connection', (ws) => {
                     return;
                 }
 
+                // Remove de inscrições anteriores
+                if (currentChatId && chatSubscriptions[currentChatId]) {
+                    chatSubscriptions[currentChatId] = chatSubscriptions[currentChatId].filter(conn => conn !== ws);
+                }
+
+                // Atualiza inscrição atual
+                currentChatId = chatId;
+                if (!chatSubscriptions[chatId]) {
+                    chatSubscriptions[chatId] = [];
+                }
+                if (!chatSubscriptions[chatId].includes(ws)) {
+                    chatSubscriptions[chatId].push(ws);
+                }
+
+                // Carrega histórico
                 const historyQuery = `
-        SELECT senderid, content, send_at
-        FROM message
-        WHERE chatid = $1
-        ORDER BY send_at ASC;
-    `;
+                    SELECT senderid, content, send_at
+                    FROM message
+                    WHERE chatid = $1
+                    ORDER BY send_at ASC;
+                `;
                 pool.query(historyQuery, [chatId])
                     .then(historyResult => {
                         ws.send(JSON.stringify({
@@ -207,9 +221,7 @@ wss.on('connection', (ws) => {
                     .catch(err => console.error("Erro ao carregar histórico:", err));
             }
 
-
-                // Enviar mensagem no chat atual
-            // Modificação do handler de "send_message" para enviar a atualização a todos os participantes conectados
+            // Enviar mensagem no chat
             else if (data.type === 'send_message') {
                 const { token, chatId, content } = data;
                 const decoded = authenticate(token);
@@ -236,16 +248,18 @@ wss.on('connection', (ws) => {
                         `;
                         pool.query(historyQuery, [chatId])
                             .then(historyResult => {
-                                // Itera sobre todos os clientes conectados e envia o histórico atualizado
-                                Object.values(clients).forEach(client => {
-                                    if (client.readyState === WebSocket.OPEN) {
-                                        client.send(JSON.stringify({
-                                            type: 'chat_history',
-                                            chatId,
-                                            messages: historyResult.rows,
-                                        }));
-                                    }
-                                });
+                                // Envio seletivo para inscritos no chat
+                                if (chatSubscriptions[chatId]) {
+                                    chatSubscriptions[chatId].forEach(client => {
+                                        if (client.readyState === WebSocket.OPEN) {
+                                            client.send(JSON.stringify({
+                                                type: 'chat_history',
+                                                chatId,
+                                                messages: historyResult.rows,
+                                            }));
+                                        }
+                                    });
+                                }
                             })
                             .catch(err => console.error("Erro ao carregar histórico:", err));
                     })
@@ -259,6 +273,10 @@ wss.on('connection', (ws) => {
 
     // Evento ao desconectar o cliente
     ws.on('close', () => {
+        // Remove de todas as inscrições
+        if (currentChatId && chatSubscriptions[currentChatId]) {
+            chatSubscriptions[currentChatId] = chatSubscriptions[currentChatId].filter(conn => conn !== ws);
+        }
         if (userId) delete clients[userId];
         console.log(`Usuário ${userId} desconectado.`);
     });
