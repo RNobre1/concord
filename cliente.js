@@ -86,7 +86,7 @@ function loadChatList(chats) {
 
     chats.forEach((chat) => {
         const li = document.createElement("li");
-        li.textContent = `${chat.nome} (${chat.tipodochat})`;
+        li.textContent = `${chat.nome}`;
         li.onclick = () => openChat(chat.chatid);
         chatList.appendChild(li);
     });
