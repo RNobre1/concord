@@ -49,7 +49,7 @@ npm install
 3. Configure o banco de dados:
 - Instale PostgreSQL
 - Execute o script `criacao-banco.sql` na pasta docs
-- Crie um arquivo .env na raiz do sistema com essa estrutura:
+- Crie um arquivo `.env` na raiz do sistema com essa estrutura:
 ```
 DB_USER=usuario_do_banco
 DB_PASSWORD=senha_do_banco
