@@ -83,7 +83,8 @@ wss.on('connection', (ws) => {
                         }
 
                         userId = result.rows[0].userid;
-                        const token = jwt.sign({ userId }, process.env.JWT_SECRET);
+                        nome = result.rows[0].nome;
+                        const token = jwt.sign({ userId, nome }, process.env.JWT_SECRET);
 
                         const sessionQuery = `
                             INSERT INTO session (userid, token)

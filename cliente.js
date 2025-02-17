@@ -21,7 +21,7 @@ ws.onmessage = (event) => {
         token = data.token;
         userId = jwtDecode(token).userId;
         // Tenta obter o nome via token ou pelo campo de registro; se indisponível, usa um valor padrão
-        const nome = jwtDecode(token).nome || document.getElementById("nome").value || "Usuário";
+        const nome = jwtDecode(token).nome || "Usuário";
         alert("Login realizado com sucesso!");
         document.getElementById("auth").style.display = "none";
         document.getElementById("app").style.display = "flex";
