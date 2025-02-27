@@ -15,12 +15,169 @@ body {
     align-items: center;
 }
 
-/* Tela de autenticação */
-#auth {
-    background-color: #fff;
-    padding: 20px;
+/* Variáveis de cores e espaçamento */
+:root {
+    --primary-color: #6366f1;
+    --primary-hover: #4f46e5;
+    --secondary-color: #f3f4f6;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --border-radius: 12px;
+    --transition-speed: 0.3s;
+}
+
+/* Layout principal */
+.auth-container {
+    display: flex;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    padding: 2rem;
+}
+
+.auth-card {
+    background: white;
+    width: 100%;
+    max-width: 440px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+/* Cabeçalho */
+.auth-header {
+    padding: 2.5rem 2rem 1.5rem;
+    text-align: center;
+    background: var(--primary-color);
+    color: white;
+}
+
+.app-logo {
+    width: 60px;
+    margin-bottom: 1.5rem;
+}
+
+.auth-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.auth-subtitle {
+    font-size: 0.875rem;
+    opacity: 0.9;
+}
+
+/* Corpo do formulário */
+.auth-body {
+    padding: 2rem 2rem 2.5rem;
+}
+
+.input-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.auth-input {
+    width: 100%;
+    height: 48px;
+    padding: 0 2.5rem 0 1rem;
+    border: 2px solid #e5e7eb;
     border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    font-size: 0.9375rem;
+    transition: all var(--transition-speed) ease;
+}
+
+.auth-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+}
+
+.input-label {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: white;
+    padding: 0 0.5rem;
+    color: var(--text-secondary);
+    transition: all var(--transition-speed) ease;
+    pointer-events: none;
+}
+
+.auth-input:focus ~ .input-label,
+.auth-input:not(:placeholder-shown) ~ .input-label {
+    top: 0;
+    font-size: 0.75rem;
+    color: var(--primary-color);
+}
+
+.icon {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+}
+
+/* Botões */
+.auth-btn {
+    width: 100%;
+    padding: 0.875rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    transition: all var(--transition-speed) ease;
+    cursor: pointer;
+}
+
+.primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.primary:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+.secondary {
+    background: var(--secondary-color);
+    color: var(--text-primary);
+}
+
+.secondary:hover {
+    background: #e5e7eb;
+}
+
+/* Opções */
+.auth-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 1.5rem 0;
+    font-size: 0.875rem;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-right: 10px;
+    padding-left: -4px;
+    color: var(--text-secondary);
+}
+
+.forgot-password {
+    color: var(--primary-color);
+    text-decoration: none;
 }
 
 /* Container principal */
