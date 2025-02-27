@@ -125,31 +125,65 @@ body {
     background-color: #fff;
 }
 
-/* Histórico de mensagens */
-#messages {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+/* styles.css - Alterações nas mensagens */
+.message {
+    position: relative;
+    max-width: 70%;
+    padding: 12px;
+    border-radius: 7.5px;
+    margin: 5px 0;
+    word-wrap: break-word;
+    box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
 }
 
-/* Mensagens */
-.message {
-    max-width: 60%;
-    padding: 10px;
-    border-radius: 8px;
-    word-wrap: break-word;
+.message-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sender-info {
+    font-size: 0.8em;
+    color: #667781;
+    font-weight: 500;
+    margin-bottom: 2px;
+}
+
+.message-time {
+    font-size: 0.75em;
+    color: #667781;
+    align-self: flex-end;
+    margin-top: 4px;
 }
 
 .message.left {
-    background-color: #ecf0f1;
+    background-color: #ffffff;
     align-self: flex-start;
+    border: 1px solid #e9edef;
 }
 
 .message.right {
-    background-color: #3498db;
-    color: #fff;
+    background-color: #d9fdd3;
     align-self: flex-end;
 }
+
+.message.left .sender-info {
+    color: #667781;
+}
+
+.message.right .sender-info {
+    color: #34b7f1;
+}
+
+/* Ajustes no container de mensagens */
+#messages {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 15px;
+    background-color: darkgray;
+}
+
 
 /* Área de entrada de mensagem */
 #chat-input {

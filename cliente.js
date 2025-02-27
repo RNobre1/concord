@@ -102,39 +102,60 @@ function openChat(chatId) {
     }));
 }
 
-// Função para carregar o histórico de mensagens do chat atual
-function loadChatHistory(messages) {
-    const messagesDiv = document.getElementById("messages");
-    messagesDiv.innerHTML = "";
-    messages.forEach((msg) => {
-        addMessage(msg.senderid === userId ? "right" : "left", msg.content);
-    });
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-}
+// cliente.js - Função addMessage modificada
+function addMessage(side, content, senderId, timestamp) {
+    const messagesDiv = document.getElementById('messages');
 
-// Função para adicionar uma mensagem ao chat
-function addMessage(side, content) {
-    const messagesDiv = document.getElementById("messages");
-    const messageDiv = document.createElement("div");
-    messageDiv.classList.add("message", side);
-    messageDiv.innerHTML = `<div class="message-content">${content}</div>`;
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message', side);
+
+    const time = new Date(timestamp).toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+
+    messageDiv.innerHTML = `
+        <div class="message-content">
+            <span class="sender-info">${senderId}</span>
+            <div class="message-text">${content}</div>
+            <span class="message-time">${time}</span>
+        </div>
+    `;
+
     messagesDiv.appendChild(messageDiv);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
-// Envio de mensagem
-document.getElementById("send-message").onclick = () => {
-    const content = document.getElementById("message-input").value;
+// Atualização no carregamento do histórico
+function loadChatHistory(messages) {
+    const messagesDiv = document.getElementById('messages');
+    messagesDiv.innerHTML = '';
+
+    messages.forEach(msg => {
+        const side = msg.senderid === userId ? 'right' : 'left';
+        addMessage(side, msg.content, msg.senderid, msg.timestamp);
+    });
+}
+
+// Modificação no envio de mensagens
+document.getElementById('send-message').onclick = () => {
+    const content = document.getElementById('message-input').value;
     if (!currentChatId || !content.trim()) return;
+
+    const timestamp = new Date().toISOString();
+
     ws.send(JSON.stringify({
-        type: "send_message",
-        token,
+        type: 'sendmessage',
+        token: token,
         chatId: currentChatId,
-        content,
+        content: content,
+        timestamp: timestamp
     }));
-    addMessage("right", content);
-    document.getElementById("message-input").value = "";
+
+    addMessage('right', content, userId, timestamp);
+    document.getElementById('message-input').value = '';
 };
+
 
 // Popup para criação de grupo
 document.getElementById("create-chat").onclick = () => {
