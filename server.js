@@ -224,7 +224,7 @@ wss.on('connection', (ws) => {
 
             // Enviar mensagem no chat
             else if (data.type === 'send_message') {
-                const { token, chatId, content } = data;
+                const { token, chatId, content, timestamp } = data;
                 const decoded = authenticate(token);
 
                 if (!decoded) {
@@ -235,11 +235,11 @@ wss.on('connection', (ws) => {
                 const senderId = decoded.userId;
 
                 const messageQuery = `
-                    INSERT INTO message (chatid, senderid, content)
-                    VALUES ($1, $2, $3)
+                    INSERT INTO message (chatid, senderid, content, send_at)
+                    VALUES ($1, $2, $3, $4)
                         RETURNING messageID;
                 `;
-                pool.query(messageQuery, [chatId, senderId, content])
+                pool.query(messageQuery, [chatId, senderId, content, timestamp])
                     .then(() => {
                         const historyQuery = `
                             SELECT senderid, content, send_at

@@ -103,22 +103,16 @@ function openChat(chatId) {
 }
 
 // cliente.js - Função addMessage modificada
-function addMessage(side, content, senderId, timestamp) {
+function addMessage(side, content, senderId) {
     const messagesDiv = document.getElementById('messages');
 
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message', side);
 
-    const time = new Date(timestamp).toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit'
-    });
-
     messageDiv.innerHTML = `
         <div class="message-content">
             <span class="sender-info">${senderId}</span>
             <div class="message-text">${content}</div>
-            <span class="message-time">${time}</span>
         </div>
     `;
 
@@ -145,8 +139,8 @@ document.getElementById('send-message').onclick = () => {
     const timestamp = new Date().toISOString();
 
     ws.send(JSON.stringify({
-        type: 'sendmessage',
-        token: token,
+        type: 'send_message',
+        token,
         chatId: currentChatId,
         content: content,
         timestamp: timestamp
